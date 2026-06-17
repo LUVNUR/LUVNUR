@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luvnur — Tattoo Artist · Siracusa</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:   #0c0c0c;
+    --red:   #b8202e;
+    --bone:  #f0ebe0;
+    --bone2: #e6e0d4;
+    --muted: rgba(240,235,224,.45);
+    --border:rgba(240,235,224,.08);
+    --display: 'Bebas Neue', sans-serif;
+    --mono:    'DM Mono', monospace;
+    --sans:    'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--bone);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px;
+    height: 64px;
+    background: rgba(12,12,12,.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Wordmark SVG in nav — compact */
+  .nav-logo {
+    display: flex; align-items: center;
+    text-decoration: none;
+    height: 28px;
+  }
+  .nav-logo svg { height: 100%; width: auto; }
+
+  .nav-links {
+    display: flex; gap: 40px; list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--bone); }
+  .nav-cta {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--bone); background: var(--red);
+    padding: 9px 20px; text-decoration: none;
+    transition: opacity .2s;
+  }
+  .nav-cta:hover { opacity: .85; }
+
+  .hamburger {
+    display: none; flex-direction: column;
+    gap: 5px; cursor: pointer; background: none; border: none;
+    padding: 4px;
+  }
+  .hamburger span {
+    display: block; width: 22px; height: 1px;
+    background: var(--bone); transition: all .3s;
+  }
+  .mobile-menu {
+    display: none; position: fixed;
+    top: 64px; left: 0; right: 0; bottom: 0;
+    background: var(--ink);
+    flex-direction: column; align-items: center;
+    justify-content: center; gap: 40px;
+    z-index: 99;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: var(--display); font-size: 36px;
+    letter-spacing: 4px; color: var(--bone);
+    text-decoration: none; transition: color .2s;
+  }
+  .mobile-menu a:hover { color: var(--red); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: 72px 72px 80px;
+    overflow: hidden;
+  }
+  .hero-video {
+    position: absolute; inset: 0;
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-video::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+    opacity: .5; pointer-events: none; z-index: 1;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0; z-index: 2;
+    background: linear-gradient(
+      to top,
+      rgba(12,12,12,.95) 0%,
+      rgba(12,12,12,.45) 55%,
+      rgba(12,12,12,.15) 100%
+    );
+  }
+  .hero-art {
+    position: absolute; inset: 0; z-index: 1;
+    overflow: hidden;
+  }
+  .hero-art svg {
+    width: 100%; height: 100%;
+    opacity: .055;
+  }
+
+  /* Hero wordmark — huge, split red/bone */
+  .hero-content { position: relative; z-index: 3; max-width: 760px; }
+  .hero-label {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--red); margin-bottom: 22px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-label::before {
+    content: ''; display: block;
+    width: 32px; height: 1px; background: var(--red);
+  }
+
+  /* The hero wordmark uses our inline SVG at large scale */
+  .hero-wordmark {
+    margin-bottom: 30px;
+    line-height: 1;
+  }
+  .hero-wordmark svg {
+    height: clamp(64px, 9vw, 120px);
+    width: auto;
+  }
+
+  .hero-desc {
+    font-size: 16px; font-weight: 300;
+    color: rgba(240,235,224,.62);
+    max-width: 500px; line-height: 1.8;
+    margin-bottom: 42px;
+  }
+  .hero-meta {
+    display: flex; gap: 48px; flex-wrap: wrap;
+    padding-top: 28px; border-top: 1px solid var(--border);
+  }
+  .hero-meta-item .meta-label {
+    font-family: var(--mono); font-size: 8px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(240,235,224,.3); margin-bottom: 4px;
+  }
+  .hero-meta-item .meta-value {
+    font-size: 14px; font-weight: 500; color: var(--bone);
+  }
+
+  .scroll-hint {
+    position: absolute; bottom: 28px; right: 72px; z-index: 3;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 8px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(240,235,224,.22);
+  }
+  .scroll-hint::after {
+    content: ''; display: block;
+    width: 1px; height: 40px; background: rgba(240,235,224,.13);
+    animation: scrollpulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollpulse {
+    0%,100%{opacity:.13;transform:scaleY(1) translateY(0)}
+    50%{opacity:.45;transform:scaleY(1.2) translateY(4px)}
+  }
+
+  /* ── BIO ── */
+  .bio {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .bio-text {
+    padding: 96px 72px;
+    border-right: 1px solid var(--border);
+  }
+  .bio-eyebrow {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--red); margin-bottom: 24px;
+  }
+  .bio-heading {
+    font-family: var(--display);
+    font-size: clamp(36px,4vw,52px);
+    letter-spacing: 2px; line-height: .95;
+    color: var(--bone); margin-bottom: 32px;
+  }
+  .bio-body {
+    font-size: 15px; font-weight: 300;
+    color: rgba(240,235,224,.6);
+    line-height: 1.8; margin-bottom: 20px;
+  }
+  .bio-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 48px;
+  }
+  .bio-stat {
+    background: var(--ink);
+    padding: 20px 22px;
+  }
+  .bs-label {
+    font-family: var(--mono); font-size: 8px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(240,235,224,.3); margin-bottom: 6px;
+  }
+  .bs-value {
+    font-family: var(--display); font-size: 28px;
+    letter-spacing: 2px; color: var(--bone); line-height: 1;
+  }
+  .bs-sub {
+    font-size: 11px; color: rgba(240,235,224,.35);
+    font-family: var(--mono); letter-spacing: 1px;
+    margin-top: 3px;
+  }
+
+  .bio-image {
+    position: relative; overflow: hidden; min-height: 480px;
+    background: #111;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 20px;
+  }
+  /* Logomark centered in bio image placeholder */
+  .bio-image .mark-placeholder {
+    opacity: .06;
+    width: 60%;
+    max-width: 280px;
+  }
+  .bio-image .mark-label {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(240,235,224,.15);
+  }
+
+  /* ── PORTFOLIO GRID ── */
+  .portfolio { padding: 0; }
+  .portfolio-header {
+    padding: 72px 72px 48px;
+    display: flex; align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .portfolio-header-left .ph-label {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--red); margin-bottom: 12px;
+  }
+  .portfolio-header-left h2 {
+    font-family: var(--display);
+    font-size: clamp(36px,4vw,56px);
+    letter-spacing: 2px; color: var(--bone); line-height: .95;
+  }
+  .portfolio-link {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    border-bottom: 1px solid rgba(240,235,224,.2);
+    padding-bottom: 2px; transition: color .2s, border-color .2s;
+  }
+  .portfolio-link:hover { color: var(--bone); border-color: var(--bone); }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+  }
+  .portfolio-item {
+    position: relative; aspect-ratio: 1;
+    background: #111; overflow: hidden;
+    cursor: pointer;
+  }
+  .portfolio-item::after {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(12,12,12,0);
+    transition: background .3s;
+  }
+  .portfolio-item:hover::after {
+    background: rgba(12,12,12,.5);
+  }
+  .portfolio-item-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 20px; z-index: 2;
+    transform: translateY(8px); opacity: 0;
+    transition: all .3s;
+  }
+  .portfolio-item:hover .portfolio-item-label {
+    transform: translateY(0); opacity: 1;
+  }
+  .pil-style {
+    font-family: var(--mono); font-size: 8px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--red); margin-bottom: 4px;
+  }
+  .pil-title {
+    font-family: var(--display); font-size: 18px;
+    letter-spacing: 2px; color: var(--bone);
+  }
+  .portfolio-placeholder {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .portfolio-placeholder svg { opacity: .06; }
+
+  /* ── TOUR CITIES ── */
+  .cities {
+    padding: 96px 72px;
+    border-top: 1px solid var(--border);
+  }
+  .cities-header {
+    display: flex; align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 56px;
+  }
+  .cities-eyebrow {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--red); margin-bottom: 12px;
+  }
+  .cities-header h2 {
+    font-family: var(--display);
+    font-size: clamp(36px,4vw,56px);
+    letter-spacing: 2px; color: var(--bone); line-height: .95;
+  }
+  .cities-list {
+    display: flex; flex-direction: column;
+    gap: 0;
+  }
+  .city-row {
+    display: grid; grid-template-columns: 48px 1fr 120px;
+    align-items: center; gap: 24px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+    transition: background .2s;
+  }
+  .city-row:first-child { border-top: 1px solid var(--border); }
+  .city-row:hover { background: rgba(240,235,224,.02); }
+  .city-n {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 2px; color: rgba(240,235,224,.2);
+  }
+  .city-name {
+    font-family: var(--display); font-size: 32px;
+    letter-spacing: 2px; color: var(--bone); line-height: 1;
+  }
+  .city-country {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(240,235,224,.3); margin-top: 3px;
+  }
+  .city-status {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 1px; text-transform: uppercase;
+    text-align: right;
+  }
+  .city-status.open { color: #4ade80; }
+  .city-status.home { color: var(--red); }
+  .city-status.soon { color: rgba(240,235,224,.3); }
+
+  /* ── CTA BOOK ── */
+  .cta-book {
+    padding: 96px 72px;
+    background: #080808;
+    border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 72px;
+    align-items: center;
+  }
+  .cta-book-text .cb-eyebrow {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--red); margin-bottom: 16px;
+  }
+  .cta-book-text h2 {
+    font-family: var(--display);
+    font-size: clamp(40px,4vw,64px);
+    letter-spacing: 2px; color: var(--bone);
+    line-height: .95; margin-bottom: 20px;
+  }
+  .cta-book-text p {
+    font-size: 15px; font-weight: 300;
+    color: rgba(240,235,224,.5); line-height: 1.75;
+    max-width: 400px;
+  }
+  .cta-book-actions {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--red); color: var(--bone);
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 3px; text-transform: uppercase;
+    padding: 18px 32px; text-decoration: none;
+    transition: opacity .2s;
+    border: none; cursor: pointer;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; color: var(--bone);
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 3px; text-transform: uppercase;
+    padding: 18px 32px; text-decoration: none;
+    border: 1px solid rgba(240,235,224,.2);
+    transition: border-color .2s, color .2s;
+  }
+  .btn-secondary:hover { border-color: var(--bone); }
+  .cta-note {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 1px; color: rgba(240,235,224,.2);
+    margin-top: 8px;
+  }
+
+  /* ── VIDEO BAND ── */
+  .video-band {
+    height: 320px; position: relative; overflow: hidden;
+    background: #080808;
+    display: flex; align-items: center; justify-content: center;
+    border-top: 3px solid var(--red);
+    border-bottom: 3px solid var(--red);
+  }
+  .video-band-bg {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(184,32,46,.03) 0px,
+      rgba(184,32,46,.03) 1px,
+      transparent 1px,
+      transparent 40px
+    );
+  }
+  .video-band-content {
+    position: relative; z-index: 2;
+    text-align: center;
+  }
+  .video-band-content .vb-tag {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--red); margin-bottom: 16px;
+  }
+  .video-band-content .vb-title {
+    font-family: var(--display);
+    font-size: clamp(52px,6vw,88px);
+    letter-spacing: 4px; color: var(--bone);
+    line-height: .9;
+  }
+  .video-band-content .vb-sub {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(240,235,224,.3); margin-top: 16px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); color: var(--bone);
+    padding: 48px 72px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 24px;
+  }
+  .footer-logo {
+    display: flex; align-items: center;
+    text-decoration: none;
+    height: 22px;
+  }
+  .footer-logo svg { height: 100%; width: auto; }
+
+  .footer-nav {
+    display: flex; gap: 32px; list-style: none;
+  }
+  .footer-nav a {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(240,235,224,.3); text-decoration: none;
+    transition: color .2s;
+  }
+  .footer-nav a:hover { color: var(--bone); }
+  .footer-copy {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 1px; color: rgba(240,235,224,.2);
+    width: 100%;
+    padding-top: 28px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+  }
+
+  /* ── SCROLL ANIMATIONS ── */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width: 900px) {
+    nav { padding: 0 24px; }
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+
+    .hero { padding: 48px 28px 60px; }
+    .scroll-hint { display: none; }
+
+    .bio { grid-template-columns: 1fr; }
+    .bio-text { padding: 64px 28px; border-right: none; border-bottom: 1px solid var(--border); }
+    .bio-image { min-height: 300px; }
+
+    .portfolio-header { padding: 48px 28px 32px; flex-direction: column; align-items: flex-start; gap: 20px; }
+    .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .cities { padding: 64px 28px; }
+    .city-row { grid-template-columns: 40px 1fr; }
+    .city-status { display: none; }
+
+    .cta-book { padding: 64px 28px; grid-template-columns: 1fr; gap: 40px; }
+
+    footer { padding: 40px 28px; flex-direction: column; align-items: flex-start; }
+    .footer-copy { flex-direction: column; gap: 8px; }
+
+    .video-band { height: 240px; }
+  }
+
+  @media(max-width: 600px) {
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .bio-stats { grid-template-columns: 1fr; }
+  }
+
+  @media(prefers-reduced-motion: reduce) {
+    .reveal { transition: none; }
+    .scroll-hint::after { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     REUSABLE SVG DEFINITIONS
+     Wordmark (LUVNUR) split: first 3 letters red, last 3 bone
+     The 1.svg has 6 letter groups at x-offsets:
+       L  @ 0.525    U  @ 220.924   V  @ 472.886
+       N  @ 726.987  U2 @ 994.461   R  @ 1246.423
+     We split L-U-V = red (#b8202e), N-U-R = bone (#f0ebe0)
+═══════════════════════════════════════════════ -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden;" aria-hidden="true">
+  <defs>
+    <symbol id="luvnur-wordmark" viewBox="0 0 1481 420" preserveAspectRatio="xMinYMid meet">
+      <!-- L — red -->
+      <g fill="#b8202e" transform="translate(0.525683, 411.237)">
+        <path d="M 21.390625 -374.46875 L 80.25 -374.46875 L 80.25 -53.5 L 177.0625 -53.5 L 177.0625 0 L 21.390625 0 Z"/>
+        <!-- outline strokes detail -->
+        <path d="M 21.398438 -383.492188 L 89.269531 -383.492188 L 89.269531 -53.496094 L 80.242188 -53.496094 L 80.242188 -62.523438 L 186.09375 -62.523438 L 186.09375 9.027344 L 12.371094 9.027344 L 12.371094 -383.492188 Z M 21.398438 -365.4375 L 21.398438 -374.464844 L 30.425781 -374.464844 L 30.425781 0 L 21.398438 0 L 21.398438 -9.027344 L 177.066406 -9.027344 L 177.066406 0 L 168.039062 0 L 168.039062 -53.496094 L 177.066406 -53.496094 L 177.066406 -44.46875 L 71.214844 -44.46875 L 71.214844 -374.464844 L 80.242188 -374.464844 L 80.242188 -365.4375 Z"/>
+      </g>
+      <!-- U — red -->
+      <g fill="#b8202e" transform="translate(220.924884, 411.237)">
+        <path d="M 77.5625 -374.46875 L 77.5625 -85.59375 C 77.5625 -72.039062 80.328125 -62.585938 85.859375 -57.234375 C 91.390625 -51.890625 98.789062 -49.21875 108.0625 -49.21875 C 117.332031 -49.21875 124.726562 -51.890625 130.25 -57.234375 C 135.78125 -62.585938 138.546875 -72.039062 138.546875 -85.59375 L 138.546875 -374.46875 L 194.1875 -374.46875 L 194.1875 -89.34375 C 194.1875 -59.019531 186.785156 -35.742188 171.984375 -19.515625 C 157.179688 -3.296875 135.335938 4.8125 106.453125 4.8125 C 77.566406 4.8125 55.722656 -3.296875 40.921875 -19.515625 C 26.117188 -35.742188 18.71875 -59.019531 18.71875 -89.34375 L 18.71875 -374.46875 Z"/>
+        <path d="M 86.59375 -374.464844 L 86.59375 -85.59375 C 86.59375 -74.589844 88.441406 -67.300781 92.136719 -63.726562 C 95.914062 -60.070312 101.222656 -58.242188 108.058594 -58.242188 C 114.898438 -58.242188 120.203125 -60.070312 123.980469 -63.726562 C 127.675781 -67.300781 129.523438 -74.589844 129.523438 -85.59375 L 129.523438 -383.492188 L 203.214844 -383.492188 L 203.214844 -89.335938 C 203.214844 -56.691406 195.027344 -31.390625 178.65625 -13.441406 C 162.066406 4.746094 138 13.84375 106.453125 13.84375 C 74.910156 13.84375 50.84375 4.746094 34.253906 -13.441406 C 17.882812 -31.390625 9.695312 -56.691406 9.695312 -89.335938 L 9.695312 -383.492188 L 86.59375 -383.492188 Z M 68.539062 -374.464844 L 77.566406 -374.464844 L 77.566406 -365.4375 L 18.722656 -365.4375 L 18.722656 -374.464844 L 27.75 -374.464844 L 27.75 -89.335938 C 27.75 -61.355469 34.363281 -40.113281 47.59375 -25.609375 C 60.601562 -11.34375 80.222656 -4.210938 106.453125 -4.210938 C 132.6875 -4.210938 152.304688 -11.34375 165.316406 -25.609375 C 178.546875 -40.113281 185.160156 -61.355469 185.160156 -89.335938 L 185.160156 -374.464844 L 194.1875 -374.464844 L 194.1875 -365.4375 L 138.550781 -365.4375 L 138.550781 -374.464844 L 147.578125 -374.464844 L 147.578125 -85.59375 C 147.578125 -69.488281 143.898438 -57.875 136.539062 -50.753906 C 129.261719 -43.710938 119.765625 -40.1875 108.058594 -40.1875 C 96.351562 -40.1875 86.859375 -43.710938 79.582031 -50.753906 C 72.222656 -57.875 68.539062 -69.488281 68.539062 -85.59375 Z"/>
+      </g>
+      <!-- V — red -->
+      <g fill="#b8202e" transform="translate(472.8861, 411.237)">
+        <path d="M 110.203125 -69.015625 L 155.140625 -374.46875 L 209.171875 -374.46875 L 151.390625 0 L 63.65625 0 L 5.890625 -374.46875 L 65.265625 -374.46875 Z"/>
+        <path d="M 101.269531 -70.324219 L 147.339844 -383.492188 L 219.691406 -383.492188 L 159.132812 9.027344 L 55.917969 9.027344 L -4.640625 -383.492188 L 73.058594 -383.492188 L 119.128906 -70.324219 L 110.199219 -69.007812 Z M 119.128906 -67.695312 L 101.269531 -67.695312 L 56.332031 -373.152344 L 65.265625 -374.464844 L 65.265625 -365.4375 L 5.882812 -365.4375 L 5.882812 -374.464844 L 14.804688 -375.839844 L 72.582031 -1.375 L 63.660156 0 L 63.660156 -9.027344 L 151.390625 -9.027344 L 151.390625 0 L 142.46875 -1.375 L 200.242188 -375.839844 L 209.164062 -374.464844 L 209.164062 -365.4375 L 155.136719 -365.4375 L 155.136719 -374.464844 L 164.066406 -373.152344 Z"/>
+      </g>
+      <!-- N — bone -->
+      <g fill="#f0ebe0" transform="translate(726.987113, 411.237)">
+        <path d="M 73.828125 -271.21875 L 73.828125 0 L 20.859375 0 L 20.859375 -374.46875 L 94.6875 -374.46875 L 155.140625 -150.328125 L 155.140625 -374.46875 L 207.5625 -374.46875 L 207.5625 0 L 147.109375 0 Z"/>
+        <path d="M 82.851562 -271.21875 L 82.851562 9.027344 L 11.835938 9.027344 L 11.835938 -383.492188 L 101.601562 -383.492188 L 163.851562 -152.671875 L 155.136719 -150.320312 L 146.109375 -150.320312 L 146.109375 -383.492188 L 216.585938 -383.492188 L 216.585938 9.027344 L 140.199219 9.027344 L 65.109375 -268.863281 L 73.824219 -271.21875 Z M 64.796875 -271.21875 L 82.539062 -273.574219 L 155.824219 -2.355469 L 147.109375 0 L 147.109375 -9.027344 L 207.558594 -9.027344 L 207.558594 0 L 198.53125 0 L 198.53125 -374.464844 L 207.558594 -374.464844 L 207.558594 -365.4375 L 155.136719 -365.4375 L 155.136719 -374.464844 L 164.164062 -374.464844 L 164.164062 -150.320312 L 146.417969 -147.96875 L 85.96875 -372.113281 L 94.6875 -374.464844 L 94.6875 -365.4375 L 20.863281 -365.4375 L 20.863281 -374.464844 L 29.890625 -374.464844 L 29.890625 0 L 20.863281 0 L 20.863281 -9.027344 L 73.824219 -9.027344 L 73.824219 0 L 64.796875 0 Z"/>
+      </g>
+      <!-- U2 — bone -->
+      <g fill="#f0ebe0" transform="translate(994.461858, 411.237)">
+        <path d="M 77.5625 -374.46875 L 77.5625 -85.59375 C 77.5625 -72.039062 80.328125 -62.585938 85.859375 -57.234375 C 91.390625 -51.890625 98.789062 -49.21875 108.0625 -49.21875 C 117.332031 -49.21875 124.726562 -51.890625 130.25 -57.234375 C 135.78125 -62.585938 138.546875 -72.039062 138.546875 -85.59375 L 138.546875 -374.46875 L 194.1875 -374.46875 L 194.1875 -89.34375 C 194.1875 -59.019531 186.785156 -35.742188 171.984375 -19.515625 C 157.179688 -3.296875 135.335938 4.8125 106.453125 4.8125 C 77.566406 4.8125 55.722656 -3.296875 40.921875 -19.515625 C 26.117188 -35.742188 18.71875 -59.019531 18.71875 -89.34375 L 18.71875 -374.46875 Z"/>
+        <path d="M 86.59375 -374.464844 L 86.59375 -85.59375 C 86.59375 -74.589844 88.441406 -67.300781 92.136719 -63.726562 C 95.914062 -60.070312 101.222656 -58.242188 108.058594 -58.242188 C 114.898438 -58.242188 120.203125 -60.070312 123.980469 -63.726562 C 127.675781 -67.300781 129.523438 -74.589844 129.523438 -85.59375 L 129.523438 -383.492188 L 203.214844 -383.492188 L 203.214844 -89.335938 C 203.214844 -56.691406 195.027344 -31.390625 178.65625 -13.441406 C 162.066406 4.746094 138 13.84375 106.453125 13.84375 C 74.910156 13.84375 50.84375 4.746094 34.253906 -13.441406 C 17.882812 -31.390625 9.695312 -56.691406 9.695312 -89.335938 L 9.695312 -383.492188 L 86.59375 -383.492188 Z M 68.539062 -374.464844 L 77.566406 -374.464844 L 77.566406 -365.4375 L 18.722656 -365.4375 L 18.722656 -374.464844 L 27.75 -374.464844 L 27.75 -89.335938 C 27.75 -61.355469 34.363281 -40.113281 47.59375 -25.609375 C 60.601562 -11.34375 80.222656 -4.210938 106.453125 -4.210938 C 132.6875 -4.210938 152.304688 -11.34375 165.316406 -25.609375 C 178.546875 -40.113281 185.160156 -61.355469 185.160156 -89.335938 L 185.160156 -374.464844 L 194.1875 -374.464844 L 194.1875 -365.4375 L 138.550781 -365.4375 L 138.550781 -374.464844 L 147.578125 -374.464844 L 147.578125 -85.59375 C 147.578125 -69.488281 143.898438 -57.875 136.539062 -50.753906 C 129.261719 -43.710938 119.765625 -40.1875 108.058594 -40.1875 C 96.351562 -40.1875 86.859375 -43.710938 79.582031 -50.753906 C 72.222656 -57.875 68.539062 -69.488281 68.539062 -85.59375 Z"/>
+      </g>
+      <!-- R — bone -->
+      <g fill="#f0ebe0" transform="translate(1246.423023, 411.237)">
+        <path d="M 144.4375 0 C 143.726562 -2.5 143.015625 -4.816406 142.296875 -6.953125 C 141.585938 -9.097656 140.960938 -11.773438 140.421875 -14.984375 C 139.890625 -18.191406 139.535156 -22.289062 139.359375 -27.28125 C 139.179688 -32.269531 139.09375 -38.507812 139.09375 -46 L 139.09375 -104.84375 C 139.09375 -122.320312 136.0625 -134.628906 130 -141.765625 C 123.9375 -148.898438 114.128906 -152.46875 100.578125 -152.46875 L 80.25 -152.46875 L 80.25 0 L 21.390625 0 L 21.390625 -374.46875 L 110.203125 -374.46875 C 140.867188 -374.46875 163.066406 -367.332031 176.796875 -353.0625 C 190.523438 -338.800781 197.390625 -317.226562 197.390625 -288.34375 L 197.390625 -258.921875 C 197.390625 -220.398438 184.550781 -195.078125 158.875 -182.953125 C 173.851562 -176.890625 184.109375 -166.992188 189.640625 -153.265625 C 195.171875 -139.535156 197.9375 -122.863281 197.9375 -103.25 L 197.9375 -45.46875 C 197.9375 -36.195312 198.289062 -28.082031 199 -21.125 C 199.71875 -14.175781 201.503906 -7.132812 204.359375 0 Z M 80.25 -320.96875 L 80.25 -205.953125 L 103.25 -205.953125 C 114.300781 -205.953125 122.945312 -208.804688 129.1875 -214.515625 C 135.425781 -220.222656 138.546875 -230.566406 138.546875 -245.546875 L 138.546875 -282.453125 C 138.546875 -296.003906 136.140625 -305.8125 131.328125 -311.875 C 126.515625 -317.9375 118.9375 -320.96875 108.59375 -320.96875 Z"/>
+        <path d="M 135.757812 2.480469 C 135.078125 0.109375 134.40625 -2.082031 133.734375 -4.101562 C 132.871094 -6.6875 132.132812 -9.820312 131.519531 -13.496094 C 130.921875 -17.089844 130.523438 -21.578125 130.332031 -26.960938 C 130.152344 -32.058594 130.058594 -38.410156 130.058594 -46.003906 L 130.058594 -104.851562 C 130.058594 -120.113281 127.746094 -130.46875 123.113281 -135.914062 C 118.855469 -140.925781 111.339844 -143.433594 100.570312 -143.433594 L 80.242188 -143.433594 L 80.242188 -152.460938 L 89.269531 -152.460938 L 89.269531 9.027344 L 12.371094 9.027344 L 12.371094 -383.492188 L 110.199219 -383.492188 C 143.429688 -383.492188 167.796875 -375.4375 183.304688 -359.328125 C 198.71875 -343.3125 206.421875 -319.652344 206.421875 -288.335938 L 206.421875 -258.914062 C 206.421875 -216.585938 191.859375 -188.542969 162.734375 -174.789062 L 158.878906 -182.953125 L 162.265625 -191.320312 C 179.617188 -184.296875 191.53125 -172.738281 198.011719 -156.632812 C 203.976562 -141.824219 206.957031 -124.027344 206.957031 -103.246094 L 206.957031 -45.46875 C 206.957031 -36.507812 207.300781 -28.699219 207.980469 -22.050781 C 208.609375 -15.9375 210.191406 -9.703125 212.730469 -3.351562 L 217.683594 9.027344 L 137.628906 9.027344 Z M 153.117188 -2.480469 L 144.4375 0 L 144.4375 -9.027344 L 204.351562 -9.027344 L 204.351562 0 L 195.96875 3.351562 C 192.804688 -4.5625 190.820312 -12.417969 190.019531 -20.210938 C 189.277344 -27.46875 188.902344 -35.890625 188.902344 -45.46875 L 188.902344 -103.246094 C 188.902344 -121.695312 186.359375 -137.242188 181.265625 -149.890625 C 176.691406 -161.25 168.101562 -169.480469 155.492188 -174.585938 L 136.390625 -182.316406 L 155.023438 -191.117188 C 177.253906 -201.613281 188.367188 -224.210938 188.367188 -258.914062 L 188.367188 -288.335938 C 188.367188 -314.800781 182.34375 -334.289062 170.296875 -346.804688 C 158.34375 -359.226562 138.308594 -365.4375 110.199219 -365.4375 L 21.398438 -365.4375 L 21.398438 -374.464844 L 30.425781 -374.464844 L 30.425781 0 L 21.398438 0 L 21.398438 -9.027344 L 80.242188 -9.027344 L 80.242188 0 L 71.214844 0 L 71.214844 -161.488281 L 100.570312 -161.488281 C 116.90625 -161.488281 129.003906 -156.859375 136.871094 -147.609375 C 144.367188 -138.789062 148.113281 -124.539062 148.113281 -104.851562 L 148.113281 -46.003906 C 148.113281 -38.625 148.203125 -32.488281 148.375 -27.605469 C 148.539062 -23 148.859375 -19.289062 149.328125 -16.460938 C 149.785156 -13.71875 150.296875 -11.5 150.859375 -9.808594 C 151.613281 -7.546875 152.367188 -5.101562 153.117188 -2.480469 Z M 89.269531 -320.96875 L 89.269531 -205.957031 L 80.242188 -205.957031 L 80.242188 -214.984375 L 103.246094 -214.984375 C 111.964844 -214.984375 118.582031 -217.046875 123.097656 -221.175781 C 127.382812 -225.09375 129.523438 -233.214844 129.523438 -245.542969 L 129.523438 -282.453125 C 129.523438 -293.90625 127.769531 -301.84375 124.261719 -306.261719 C 121.253906 -310.046875 116.03125 -311.941406 108.59375 -311.941406 L 80.242188 -311.941406 L 80.242188 -320.96875 Z M 71.214844 -329.996094 L 108.59375 -329.996094 C 121.84375 -329.996094 131.777344 -325.828125 138.398438 -317.488281 C 144.519531 -309.78125 147.578125 -298.105469 147.578125 -282.453125 L 147.578125 -245.542969 C 147.578125 -227.910156 143.480469 -215.347656 135.28125 -207.851562 C 127.316406 -200.570312 116.636719 -196.929688 103.246094 -196.929688 L 71.214844 -196.929688 Z"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ── NAVIGATION ── -->
+<nav>
+  <a href="#" class="nav-logo" aria-label="Luvnur">
+    <svg aria-hidden="true"><use href="#luvnur-wordmark"/></svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#cities">Guest Spot</a></li>
+    <li><a href="#contact">Contatti</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Prenota</a>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#portfolio" onclick="toggleMenu()">Portfolio</a>
+  <a href="#cities" onclick="toggleMenu()">Guest Spot</a>
+  <a href="#contact" onclick="toggleMenu()">Contatti</a>
+  <a href="#contact" onclick="toggleMenu()" style="color:var(--red)">Prenota →</a>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-video">
+    <div class="hero-art">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="blur1"><feGaussianBlur stdDeviation="2"/></filter>
+        </defs>
+        <ellipse cx="720" cy="450" rx="280" ry="380" fill="none" stroke="#f0ebe0" stroke-width="1" filter="url(#blur1)"/>
+        <ellipse cx="720" cy="450" rx="200" ry="300" fill="none" stroke="#b8202e" stroke-width=".5"/>
+        <line x1="0" y1="225" x2="1440" y2="225" stroke="#f0ebe0" stroke-width=".5"/>
+        <line x1="0" y1="675" x2="1440" y2="675" stroke="#f0ebe0" stroke-width=".5"/>
+        <line x1="360" y1="0" x2="360" y2="900" stroke="#f0ebe0" stroke-width=".5"/>
+        <line x1="1080" y1="0" x2="1080" y2="900" stroke="#f0ebe0" stroke-width=".5"/>
+        <path d="M200,900 Q400,400 720,100 Q1040,400 1240,900" fill="none" stroke="#b8202e" stroke-width=".7" filter="url(#blur1)"/>
+        <circle cx="720" cy="450" r="1" fill="#b8202e" stroke="none">
+          <animate attributeName="r" values="1;320;1" dur="8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="8s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+  </div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <div class="hero-label">Tattoo Artist · Siracusa, IT</div>
+
+    <!-- Hero wordmark — real SVG, large -->
+    <div class="hero-wordmark" aria-label="LUVNUR">
+      <svg aria-hidden="true"><use href="#luvnur-wordmark"/></svg>
+    </div>
+
+    <p class="hero-desc">
+      Surrealism, graphic, fineline, realism. Ogni tatuaggio nasce da una conversazione — trasformo la tua storia in qualcosa che indosserai, prenderò le tue misure dell'anima.
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <div class="meta-label">Base</div>
+        <div class="meta-value">Siracusa · Studio proprio</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="meta-label">Guest spot</div>
+        <div class="meta-value">Padova · Guest fisso</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="meta-label">Stile</div>
+        <div class="meta-value">Surrealism · Graphic · Fineline</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">scroll</div>
+</section>
+
+<!-- ── BIO ── -->
+<section class="bio" id="bio">
+  <div class="bio-text reveal">
+    <div class="bio-eyebrow">Chi sono</div>
+    <h2 class="bio-heading">L'ARTISTA<br>DIETRO<br>L'AGO</h2>
+    <p class="bio-body">
+      Nicola, alias Luvnur, è un tattoo artist con studio a Siracusa. Il suo approccio non è quello del catalogo: ogni progetto nasce da una consulenza, da un'ora di conversazione, da una visione condivisa prima ancora che l'ago tocchi la pelle.
+    </p>
+    <p class="bio-body">
+      Lavora con stili che si attraversano — dal surrealismo al grafico, dalla fineline al realism — senza scegliere un'unica voce. La firma non è nello stile, è nel modo in cui ogni storia diventa qualcosa che indosserai per sempre.
+    </p>
+    <div class="bio-stats">
+      <div class="bio-stat">
+        <div class="bs-label">Base</div>
+        <div class="bs-value">SIRACUSA</div>
+        <div class="bs-sub">Studio proprio</div>
+      </div>
+      <div class="bio-stat">
+        <div class="bs-label">Guest spot</div>
+        <div class="bs-value">PADOVA</div>
+        <div class="bs-sub">Fisso · altri in arrivo</div>
+      </div>
+      <div class="bio-stat">
+        <div class="bs-label">Handle</div>
+        <div class="bs-value" style="font-size:18px; letter-spacing:2px;">@LUVNUR.TTT</div>
+        <div class="bs-sub">Instagram</div>
+      </div>
+      <div class="bio-stat">
+        <div class="bs-label">Stili</div>
+        <div class="bs-value" style="font-size:16px; letter-spacing:1px; line-height:1.2;">5+</div>
+        <div class="bs-sub">Surreal · Graphic · Fineline · Realism · Lettering</div>
+      </div>
+    </div>
+  </div>
+  <div class="bio-image">
+    <!-- Logomark as background art -->
+    <svg class="mark-placeholder" viewBox="0 0 1500 1500" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <!-- simplified circular mark from logo_mark.svg — we render the mask as white shape -->
+      <rect width="1500" height="1500" fill="none"/>
+      <circle cx="750" cy="750" r="680" fill="none" stroke="#f0ebe0" stroke-width="3"/>
+      <circle cx="750" cy="750" r="520" fill="none" stroke="#b8202e" stroke-width="2"/>
+      <line x1="750" y1="70" x2="750" y2="1430" stroke="#f0ebe0" stroke-width="2"/>
+      <line x1="70" y1="750" x2="1430" y2="750" stroke="#f0ebe0" stroke-width="2"/>
+      <path d="M 750 70 Q 1100 400 1430 750 Q 1100 1100 750 1430 Q 400 1100 70 750 Q 400 400 750 70Z" fill="none" stroke="#b8202e" stroke-width="1.5"/>
+      <!-- inner mark suggestion -->
+      <text x="750" y="800" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="280" fill="#f0ebe0" letter-spacing="20" opacity="0.4">LUV</text>
+    </svg>
+    <div class="mark-label">Foto profilo / Studio</div>
+  </div>
+</section>
+
+<!-- ── PORTFOLIO ── -->
+<section class="portfolio" id="portfolio">
+  <div class="portfolio-header reveal">
+    <div class="portfolio-header-left">
+      <div class="ph-label">Portfolio</div>
+      <h2>LAVORI<br>RECENTI</h2>
+    </div>
+    <a href="#contact" class="portfolio-link">Vedi tutto il portfolio →</a>
+  </div>
+
+  <div class="portfolio-grid">
+    <div class="portfolio-item reveal">
+      <div class="portfolio-placeholder">
+        <svg viewBox="0 0 400 400" width="400" height="400">
+          <rect width="400" height="400" fill="#111"/>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="48" fill="#f0ebe0" letter-spacing="4">SURREALISM</text>
+        </svg>
+      </div>
+      <div class="portfolio-item-label">
+        <div class="pil-style">Surrealism</div>
+        <div class="pil-title">Lavoro 01</div>
+      </div>
+    </div>
+    <div class="portfolio-item reveal">
+      <div class="portfolio-placeholder">
+        <svg viewBox="0 0 400 400" width="400" height="400">
+          <rect width="400" height="400" fill="#0f0f0f"/>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="48" fill="#f0ebe0" letter-spacing="4">GRAPHIC</text>
+        </svg>
+      </div>
+      <div class="portfolio-item-label">
+        <div class="pil-style">Graphic</div>
+        <div class="pil-title">Lavoro 02</div>
+      </div>
+    </div>
+    <div class="portfolio-item reveal">
+      <div class="portfolio-placeholder">
+        <svg viewBox="0 0 400 400" width="400" height="400">
+          <rect width="400" height="400" fill="#131313"/>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="48" fill="#f0ebe0" letter-spacing="4">FINELINE</text>
+        </svg>
+      </div>
+      <div class="portfolio-item-label">
+        <div class="pil-style">Fineline</div>
+        <div class="pil-title">Lavoro 03</div>
+      </div>
+    </div>
+    <div class="portfolio-item reveal">
+      <div class="portfolio-placeholder">
+        <svg viewBox="0 0 400 400" width="400" height="400">
+          <rect width="400" height="400" fill="#111"/>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="48" fill="#f0ebe0" letter-spacing="4">REALISM</text>
+        </svg>
+      </div>
+      <div class="portfolio-item-label">
+        <div class="pil-style">Realism</div>
+        <div class="pil-title">Lavoro 04</div>
+      </div>
+    </div>
+    <div class="portfolio-item reveal">
+      <div class="portfolio-placeholder">
+        <svg viewBox="0 0 400 400" width="400" height="400">
+          <rect width="400" height="400" fill="#0e0e0e"/>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="48" fill="#f0ebe0" letter-spacing="4">BLACKWORK</text>
+        </svg>
+      </div>
+      <div class="portfolio-item-label">
+        <div class="pil-style">Blackwork</div>
+        <div class="pil-title">Lavoro 05</div>
+      </div>
+    </div>
+    <div class="portfolio-item reveal">
+      <div class="portfolio-placeholder">
+        <svg viewBox="0 0 400 400" width="400" height="400">
+          <rect width="400" height="400" fill="#121212"/>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="48" fill="#f0ebe0" letter-spacing="4">LETTERING</text>
+        </svg>
+      </div>
+      <div class="portfolio-item-label">
+        <div class="pil-style">Lettering</div>
+        <div class="pil-title">Lavoro 06</div>
+      </div>
+    </div>
+    <div class="portfolio-item reveal" style="background: var(--red); cursor: pointer;" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:32px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.6);">Hai un'idea?</div>
+        <div style="font-family:var(--display);font-size:36px;letter-spacing:3px;color:#fff;text-align:center;line-height:1;">PARLIAMONE</div>
+        <div style="width:32px;height:2px;background:rgba(255,255,255,.4);"></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);">Consulenza gratuita →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TOUR CITIES ── -->
+<section class="cities" id="cities">
+  <div class="cities-header reveal">
+    <div>
+      <div class="cities-eyebrow">Guest spot</div>
+      <h2>DOVE<br>LAVORO</h2>
+    </div>
+    <a href="#contact" class="portfolio-link">Prenotami nella tua città →</a>
+  </div>
+  <div class="cities-list">
+    <div class="city-row reveal">
+      <div class="city-n">01</div>
+      <div>
+        <div class="city-name">SIRACUSA</div>
+        <div class="city-country">Italia — Studio proprio</div>
+      </div>
+      <div class="city-status home">● Base</div>
+    </div>
+    <div class="city-row reveal">
+      <div class="city-n">02</div>
+      <div>
+        <div class="city-name">PADOVA</div>
+        <div class="city-country">Italia — Guest fisso</div>
+      </div>
+      <div class="city-status open">● Disponibile</div>
+    </div>
+    <div class="city-row reveal">
+      <div class="city-n">03</div>
+      <div>
+        <div class="city-name">MILANO</div>
+        <div class="city-country">Italia</div>
+      </div>
+      <div class="city-status soon">In arrivo</div>
+    </div>
+    <div class="city-row reveal">
+      <div class="city-n">04</div>
+      <div>
+        <div class="city-name">ROMA</div>
+        <div class="city-country">Italia</div>
+      </div>
+      <div class="city-status soon">In arrivo</div>
+    </div>
+    <div class="city-row reveal">
+      <div class="city-n">05</div>
+      <div>
+        <div class="city-name">BERLINO</div>
+        <div class="city-country">Germania</div>
+      </div>
+      <div class="city-status soon">In arrivo</div>
+    </div>
+    <div class="city-row reveal">
+      <div class="city-n">06</div>
+      <div>
+        <div class="city-name">LONDRA</div>
+        <div class="city-country">UK</div>
+      </div>
+      <div class="city-status soon">In arrivo</div>
+    </div>
+    <div class="city-row reveal" style="border-bottom:1px solid var(--red); padding-bottom:24px;">
+      <div class="city-n" style="color:var(--red);">+</div>
+      <div>
+        <div class="city-name" style="color:var(--red); font-size:22px;">PRENOTA NELLA TUA CITTÀ</div>
+        <div class="city-country">Scrivimi — organizzo guest spot su richiesta</div>
+      </div>
+      <div class="city-status">
+        <a href="#contact" style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--red);text-decoration:none;">DM →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VIDEO BAND ── -->
+<div class="video-band">
+  <div class="video-band-bg"></div>
+  <div class="video-band-content reveal">
+    <div class="vb-tag">Consulenza gratuita · Risposta entro 48h</div>
+    <div class="vb-title">OGNI IDEA<br>MERITA<br>LA PELLE</div>
+    <div class="vb-sub">Siracusa · @luvnur.ttt</div>
+  </div>
+</div>
+
+<!-- ── CTA PRENOTAZIONE ── -->
+<section class="cta-book" id="contact">
+  <div class="cta-book-text reveal">
+    <div class="cb-eyebrow">Prenota una consulenza</div>
+    <h2>INIZIA<br>DA UNA<br>STORIA</h2>
+    <p>La consulenza è gratuita. Raccontami quello che porti dentro — anche se non sai ancora esattamente come metterlo sulla pelle. Ci penso io.</p>
+  </div>
+  <div class="cta-book-actions reveal">
+    <a href="https://wa.me/39XXXXXXXXXX" class="btn-primary">Scrivimi su WhatsApp</a>
+    <a href="https://instagram.com/luvnur.ttt" class="btn-secondary">DM su Instagram</a>
+    <div class="cta-note">Rispondo entro 48h · Nessun impegno fino alla conferma</div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <a href="#" class="footer-logo" aria-label="Luvnur">
+    <svg aria-hidden="true"><use href="#luvnur-wordmark"/></svg>
+  </a>
+  <ul class="footer-nav">
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#cities">Guest Spot</a></li>
+    <li><a href="#contact">Prenota</a></li>
+    <li><a href="https://instagram.com/luvnur.ttt">Instagram</a></li>
+  </ul>
+  <div class="footer-copy">
+    <span>© 2025 Luvnur — @luvnur.ttt — Siracusa, IT</span>
+    <span style="font-family:var(--mono);font-size:8px;letter-spacing:2px;color:rgba(240,235,224,.12);">SURREALISM · GRAPHIC · FINELINE · REALISM · LETTERING</span>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(r => obs.observe(r));
+
+  // Nav opacity on scroll
+  const navEl = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    navEl.style.background = window.scrollY > 60
+      ? 'rgba(12,12,12,.97)'
+      : 'rgba(12,12,12,.88)';
+  });
+</script>
+</body>
+</html>
